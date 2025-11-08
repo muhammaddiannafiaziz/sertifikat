@@ -8,46 +8,52 @@
     <style>
         @page {
             size: A4 landscape;
-            /* Ukuran kertas A4 landscape */
             margin: 0;
-            /* Hapus margin default */
         }
 
         body {
             margin: 0;
             padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        .page {
             width: 297mm;
             height: 210mm;
-            font-family: Arial, sans-serif;
-            background: url('data:image/jpeg;base64,{{ base64_encode(file_get_contents(public_path("storage/backgrounds/bg.png"))) }}') no-repeat center center;
+            position: relative;
+        }
+
+        .bg-ibadah {
+            background: url('data:image/jpeg;base64,{{ base64_encode(file_get_contents(public_path("storage/backgrounds/bgsklalquran.png"))) }}') no-repeat center center;
             background-size: cover;
-            /* Gambar memenuhi seluruh halaman */
+        }
+
+        .bg-alquran {
+            background: url('data:image/jpeg;base64,{{ base64_encode(file_get_contents(public_path("storage/backgrounds/bgsklibadah.png"))) }}') no-repeat center center;
+            background-size: cover;
         }
 
         .content {
             text-align: center;
             color: #000;
-            /* Warna teks hitam */
-            padding: 10mm 20mm;
+            padding: 20mm;
             position: relative;
         }
 
         .details {
             font-size: 18px;
-            /* margin-bottom: 20mm; */
             line-height: 0.5;
             text-align: left;
-            margin-left: 85mm;
-            margin-top: 95mm;
-            /* Penurunan posisi dengan margin top */
+            margin-left: 25mm;
+            margin-top: 70mm;
         }
 
-        .qr-code {
+         .qr-code {
             position: absolute;
             bottom: 10mm;
             left: 10mm;
-            margin-left: 100mm;
-            margin-bottom: 20mm;
+            margin-left: 240mm;
+            margin-bottom: 150mm;
             width: 100px;
             height: 100px;
         }
@@ -60,19 +66,45 @@
 </head>
 
 <body>
-    <div class="content">
-        <!-- Nama, Program Studi, dan NIM Section -->
-        <div class="mt-8 details">
-            <p><strong>Nama:</strong> {{ $sertifikat->mahasiswa->nama }}</p>
-            <p><strong>Program Studi:</strong> {{ $sertifikat->mahasiswa->program_studi }}</p>
-            <p><strong>NIM:</strong> {{ $sertifikat->mahasiswa->nim }}</p>
+    @if($sertifikat->status_ujian_ibadah == 'lulus')
+        <div class="page bg-ibadah">
+            <div class="content">
+                <div class="details">
+                    <p><strong>{{ $sertifikat->no_sertifikat }}</strong></p>
+                    <br>
+                    <p><strong>Nama:</strong> {{ $sertifikat->mahasiswa->nama }}</p>
+                    <p><strong>Program Studi:</strong> {{ $sertifikat->mahasiswa->program_studi }}</p>
+                    <p><strong>NIM:</strong> {{ $sertifikat->mahasiswa->nim }}</p>
+                    <br>
+                    <p><strong>DINYATAKAN LULUS</strong></p>
+                    <p>TES SKL IBADAH UIN RADEN MAS SAID SURAKARTA</p>
+                </div>
+                <div class="qr-code">
+                    <img src="data:image/png;base64,{{ $qrCodeBase64 }}" alt="QR Code">
+                </div>
+            </div>
         </div>
+    @endif
 
-        <!-- QR Code Section -->
-        <div class="qr-code">
-            <img src="data:image/png;base64,{{ $qrCodeBase64 }}" alt="QR Code">
+    @if($sertifikat->status_ujian_alquran == 'lulus')
+        <div class="page bg-alquran">
+            <div class="content">
+                <div class="details">
+                    <p><strong>{{ $sertifikat->no_sertifikat }}</strong></p>
+                    <br>
+                    <p><strong>Nama:</strong> {{ $sertifikat->mahasiswa->nama }}</p>
+                    <p><strong>Program Studi:</strong> {{ $sertifikat->mahasiswa->program_studi }}</p>
+                    <p><strong>NIM:</strong> {{ $sertifikat->mahasiswa->nim }}</p>
+                    <br>
+                    <p><strong>DINYATAKAN LULUS</strong></p>
+                    <p>TES SKL ALQUR'AN UIN RADEN MAS SAID SURAKARTA</p>
+                </div>
+                <div class="qr-code">
+                    <img src="data:image/png;base64,{{ $qrCodeBase64 }}" alt="QR Code">
+                </div>
+            </div>
         </div>
-    </div>
+    @endif
 </body>
 
 </html>

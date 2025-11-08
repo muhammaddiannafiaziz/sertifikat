@@ -1,5 +1,4 @@
 # Simpan sebagai: docker-compose.yml
-version: '3.8'
 
 services:
   # 1. Service Aplikasi (PHP)
@@ -33,10 +32,10 @@ services:
     container_name: sertifikat_db
     restart: unless-stopped
     environment:
-      MYSQL_DATABASE: db_sertifikat
+      MYSQL_DATABASE: sertifmahad25
       MYSQL_USER: user_sertifikat
       MYSQL_PASSWORD: password_rahasia
-      MYSQL_ROOT_PASSWORD: password_root_rahasia # <-- HARUS SAMA DENGAN PMA
+      MYSQL_ROOT_PASSWORD: password_root_rahasia
     volumes:
       - db_data:/var/lib/mysql
     ports:
