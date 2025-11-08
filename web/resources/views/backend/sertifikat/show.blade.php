@@ -32,8 +32,8 @@
                 </table>
             </div>
 
-            <!-- Informasi Sertifikat -->
-            <h5 class="card-title mt-4 mb-4">Informasi Sertifikat</h5>
+            <!-- Informasi Sertifikat SKL Ibadah dan Al-Qur'an -->
+            <h5 class="card-title mt-4 mb-4">Informasi Sertifikat SKL Ibadah dan Al-Qur'an</h5>
             <div class="table-responsive">
                 <table class="table table-bordered table-striped">
                     <tr>
@@ -50,9 +50,64 @@
                     </tr>
                 </table>
             </div>
+            <!-- Rincian Nilai SKL Bahasa Arab -->
+            <h5 class="card-title mt-4 mb-4">Rincian Nilai SKL Bahasa Arab</h5>
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped">
+                    <tr>
+                        <td><strong>Istima'</strong></td>
+                        <td>{{ $sertifikat->istima ?? 'N/A' }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Kitabah</strong></td>
+                        <td>{{ $sertifikat->kitabah ?? 'N/A' }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Qira'ah</strong></td>
+                        <td>{{ $sertifikat->qiraah ?? 'N/A' }}</td>
+                    </tr>
+                </table>
+            </div>
+            <!-- Rincian Nilai SKL Bahasa Inggris -->
+            <h5 class="card-title mt-4 mb-4">Rincian Nilai SKL Bahasa Inggris</h5>
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped">
+                    <tr>
+                        <td><strong>Listening</strong></td>
+                        <td>{{ $sertifikat->listening ?? 'N/A' }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Structure and Written Expression</strong></td>
+                        <td>{{ $sertifikat->word ?? 'N/A' }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Reading</strong></td>
+                        <td>{{ $sertifikat->reading ?? 'N/A' }}</td>
+                    </tr>
+                </table>
+            </div>
+            <!-- Rincian Nilai SKL Komputer -->
+            <h5 class="card-title mt-4 mb-4">Rincian Nilai SKL Komputer</h5>
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped">
+                    <tr>
+                        <td><strong>Microsoft Word</strong></td>
+                        <td>{{ $sertifikat->word ?? 'N/A' }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Microsoft Excel</strong></td>
+                        <td>{{ $sertifikat->excel ?? 'N/A' }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Microsoft PowerPoint</strong></td>
+                        <td>{{ $sertifikat->power_point ?? 'N/A' }}</td>
+                    </tr>
+                </table>
+            </div>
         </div>
     </div>
 
+    
     <!-- Tombol Aksi -->
     <div class="d-flex justify-content-end mt-4">
         <a href="{{ route('sertifikat.index') }}" class="btn btn-sm btn-secondary me-2">

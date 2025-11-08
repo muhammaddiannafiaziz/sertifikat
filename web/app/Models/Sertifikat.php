@@ -9,19 +9,33 @@ class Sertifikat extends Model
 {
     use HasFactory;
 
-    // Tentukan nama tabel yang digunakan oleh model ini
     protected $table = 'sertifikats';
 
-    // Tentukan kolom yang bisa diisi (mass assignment)
+    // TAMBAHKAN 9 KOLOM BARU DI BAWAH INI
     protected $fillable = [
         'mahasiswa_id',
         'no_sertifikat',
         'status_ujian_ibadah',
         'status_ujian_alquran',
         'background_image',
+
+        // SKL Bahasa Arab
+        'istima',
+        'kitabah',
+        'qiraah',
+
+        // SKL Bahasa Inggris
+        'listening',
+        'writing',
+        'reading',
+
+        // SKL Komputer
+        'word',
+        'excel',
+        'power_point',
     ];
 
-    // Relasi ke Mahasiswa
+    // ... (Relasi mahasiswa() Anda tetap di sini)
     public function mahasiswa()
     {
         return $this->belongsTo(Mahasiswa::class);
