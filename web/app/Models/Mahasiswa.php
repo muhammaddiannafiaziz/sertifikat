@@ -18,9 +18,28 @@ class Mahasiswa extends Model
         'email'
     ];
 
-    public function sertifikats()
+    /**
+     * Mendapatkan data SKL Ma'had yang dimiliki oleh mahasiswa.
+     */
+    public function sklMahad()
     {
-        return $this->hasMany(Sertifikat::class);
+        return $this->hasOne(SklMahad::class);
+    }
+
+    /**
+     * Mendapatkan data SKL Bahasa yang dimiliki oleh mahasiswa.
+     */
+    public function sklBahasa()
+    {
+        return $this->hasOne(SklBahasa::class);
+    }
+
+    /**
+     * Mendapatkan data SKL TIPD yang dimiliki oleh mahasiswa.
+     */
+    public function sklTipd()
+    {
+        return $this->hasOne(SklTipd::class);
     }
 
     // Relasi Many-to-Many dengan Ujian
