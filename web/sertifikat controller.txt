@@ -1,0 +1,107 @@
+
+namespace App\Http\Controllers;
+
+use App\Models\Sertifikat;
+use App\Models\Mahasiswa;
+use Illuminate\Http\Request;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
+
+class SertifikatController extends Controller
+{
+    public function index()
+    {
+        $mahasiswa = Mahasiswa::all();
+        return view('sertifikat.index', compact('mahasiswa'));
+    }
+
+    public function generateSertifikat(Request $request)
+    {
+        // Validasi input dari request
+        $validated = $request->validate([
+            'mahasiswa_id' => 'required|exists:mahasiswas,id',
+            'nilai_ujian_ibadah' => 'required|numeric',
+            'nilai_ujian_alquran' => 'required|numeric',
+            'background_image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
+
+        // Ambil data mahasiswa
+        $mahasiswa = Mahasiswa::find($validated['mahasiswa_id']);
+
+        // Kustomisasi nomor sertifikat
+        $no_sertifikat = 'SERT-' . date('Y') . '-' . strtoupper(Str::substr($mahasiswa->program_studi, 0, 3)) . '-' . $mahasiswa->nim . '-' . Str::random(5);
+
+        // Upload background image jika ada
+        $backgroundPath = null;
+        if ($request->hasFile('background_image')) {
+            $backgroundPath = $request->file('background_image')->store('backgrounds', 'public');
+        }
+
+        // Simpan data sertifikat ke database
+        $sertifikat = Sertifikat::create([
+            'mahasiswa_id' => $validated['mahasiswa_id'],
+            'no_sertifikat' => $no_sertifikat,
+            'nilai_ujian_ibadah' => $validated['nilai_ujian_ibadah'],
+            'nilai_ujian_alquran' => $validated['nilai_ujian_alquran'],
+            'background_image' => $backgroundPath,
+        ]);
+
+        // Generate QR code untuk validasi sertifikat
+        $validationUrl = url("/sertifikat/validasi/{$no_sertifikat}");
+        $qrCodeImage = QrCode::format('png')->size(200)->generate($validationUrl);
+
+        // Simpan gambar QR code ke folder public/storage
+        $fileName = 'qrcode_' . $no_sertifikat . '.png';
+        Storage::disk('public')->put($fileName, $qrCodeImage);
+
+        // URL untuk QR Code
+        $qrCodeUrl = asset('storage/' . $fileName);
+
+        return view('sertifikat.show', compact('sertifikat', 'qrCodeUrl'));
+    }
+
+    public function validasiSertifikat($no_sertifikat)
+    {
+        // Cari sertifikat berdasarkan nomor sertifikat
+        $sertifikat = Sertifikat::where('no_sertifikat', $no_sertifikat)->first();
+
+        if (!$sertifikat) {
+            return redirect()->route('home')->with('error', 'Sertifikat tidak ditemukan.');
+        }
+
+        return view('sertifikat.validasi', compact('sertifikat'));
+    }
+
+    public function downloadSertifikat($no_sertifikat)
+    {
+        // Cari sertifikat berdasarkan nomor sertifikat
+        $sertifikat = Sertifikat::where('no_sertifikat', $no_sertifikat)->first();
+
+        if (!$sertifikat) {
+            return redirect()->route('home')->with('error', 'Sertifikat tidak ditemukan.');
+        }
+
+        // Generate QR code untuk validasi sertifikat dengan URL validasi
+        $validationUrl = url("/sertifikat/validasi/{$no_sertifikat}");
+        $qrCodeImage = QrCode::format('png')->size(200)->generate($validationUrl);
+
+        // Konversi QR Code ke Base64
+        $qrCodeBase64 = base64_encode($qrCodeImage);
+
+        // Buat data untuk view PDF
+        $data = [
+            'sertifikat' => $sertifikat,
+            'qrCodeBase64' => $qrCodeBase64,
+        ];
+
+        // Buat HTML untuk sertifikat PDF
+        $html = view('sertifikat.pdf', $data)->render();
+
+        // Buat file PDF menggunakan HTML
+        $pdf = \PDF::loadHTML($html)->setPaper('a4', 'landscape');
+
+        // Download PDF
+        return $pdf->download('sertifikat-' . $sertifikat->no_sertifikat . '.pdf');
+    }
+}
