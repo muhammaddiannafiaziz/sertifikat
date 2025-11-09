@@ -19,6 +19,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // KOSONGKAN BAGIAN INI DARI KODE GATE
     }
 }

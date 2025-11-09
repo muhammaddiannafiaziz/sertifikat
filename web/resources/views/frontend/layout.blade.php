@@ -46,7 +46,7 @@
             <div class="navbar-collapse offcanvas-collapse lg:flex lg:flex-grow lg:items-center" id="navbarsExampleDefault">
                 <ul class="pl-0 mt-3 mb-2 ml-auto flex flex-col list-none lg:mt-0 lg:mb-0 lg:flex-row">
                     <li><a class="nav-link page-scroll" href="{{ route('welcome') }}">Home</a></li>
-                    <li><a class="nav-link page-scroll" href="{{ route('cek-sertifikat') }}">Sertifikat</a></li>
+                    <li><a class="nav-link page-scroll" href="{{ route('public.cek') }}">Sertifikat</a></li>
                     <li><a class="nav-link page-scroll" href="https://lens.google.com">Validasi</a></li>
                     <!-- <li><a class="nav-link page-scroll" href="{{ route('login') }}">Login</a></li> -->
                 </ul>

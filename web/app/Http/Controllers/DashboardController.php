@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Mahasiswa;  // Import model Mahasiswa
-use App\Models\Sertifikat;
+//use App\Models\Sertifikat;
 
 class DashboardController extends Controller
 {
@@ -12,8 +12,11 @@ class DashboardController extends Controller
         // Mengambil total mahasiswa
         $totalMahasiswa = Mahasiswa::count();  // Ini akan memberikan jumlah total mahasiswa
 
-        $totalSertifikat = Sertifikat::count();  // Ini akan memberikan jumlah total mahasiswa
+        //$totalSertifikat = Sertifikat::count();  // Ini akan memberikan jumlah total mahasiswa
         // Mengirimkan data ke view
-        return view('dashboard', compact('totalMahasiswa', 'totalSertifikat'));
+        return view('dashboard', compact('totalMahasiswa', 
+                                         //$totalSertifikat
+                                         ));
     }
 }
+

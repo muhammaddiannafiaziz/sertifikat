@@ -5,7 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Dashboard Control Panel')</title>
-    <!-- Menggunakan CDN Bootstrap dan Icon -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
 
@@ -295,7 +294,6 @@
 
 <body>
 
-    <!-- Sidebar -->
     <nav class="sidebar sidebar-offcanvas" id="sidebar">
 
         <div class="mb-4 row">
@@ -303,7 +301,6 @@
                 <h3>e-Sertif.</h3>
             </div>
             <div class="col-4">
-                <!-- Tombol Sidebar -->
                 <button id="toggleSidebar" class="ms-4 btn btn-primary">
                     <i class="bi bi-arrow-left-right"></i>
                 </button>
@@ -317,40 +314,72 @@
                     <span class="px-2 menu-title">Dashboard</span>
                 </a>
             </li>
+
+            @can('is-superadmin')
             <li class="nav-item">
-                <a class="nav-link {{ request()->routeIs('mahasiswa.index') ? 'active' : '' }}" href="{{ route('mahasiswa.index') }}">
+                <a class="nav-link {{ request()->routeIs('mahasiswa.*') ? 'active' : '' }}" href="{{ route('mahasiswa.index') }}">
                     <i class="bi bi-person-square menu-icon"></i>
                     <span class="px-2 menu-title">Mahasiswa</span>
                 </a>
             </li>
+            @endcan
+            
+            {{-- 
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('sertifikat.index') ? 'active' : '' }}" href="{{ route('sertifikat.index') }}">
                     <i class="bi bi-file-earmark-text menu-icon"></i>
                     <span class="px-2 menu-title">Sertifikat</span>
                 </a>
-            </li>
+            </li> 
+            --}}
 
+            @can('manage-mahad')
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('skl-mahad.*') ? 'active' : '' }}" href="{{ route('skl-mahad.index') }}">
+                    <i class="bi bi-book-half menu-icon"></i>
+                    <span class="px-2 menu-title">SKL Ma'had</span>
+                </a>
+            </li>
+            @endcan
+
+            @can('manage-bahasa')
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('skl-bahasa.*') ? 'active' : '' }}" href="{{ route('skl-bahasa.index') }}">
+                    <i class="bi bi-translate menu-icon"></i>
+                    <span class="px-2 menu-title">SKL Bahasa</span>
+                </a>
+            </li>
+            @endcan
+            
+            @can('manage-tipd')
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('skl-tipd.*') ? 'active' : '' }}" href="{{ route('skl-tipd.index') }}">
+                    <i class="bi bi-pc-display menu-icon"></i>
+                    <span class="px-2 menu-title">SKL Komputer</span>
+                </a>
+            </li>
+            @endcan
+
+            @can('is-superadmin')
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('users.index') ? 'active' : '' }}" href="{{ route('users.index') }}">
                     <i class="bi bi-person-fill-add menu-icon"></i>
                     <span class="px-2 menu-title">Akun</span>
                 </a>
             </li>
+            @endcan
         </ul>
-    </nav>
+        </nav>
 
-    <!-- Main Content -->
     <div class="main-content">
 
         <header class="navbar navbar-light navbar-glass navbar-top navbar-expand navbar-glass-shadow">
 
-            <!-- Keterangan Halaman di Kiri Atas -->
             <div class="position-absolute start-0 top-0 m-3">
                 <h6 class="fw-bold text-primary">Dashboard e-Sertifikat</h6>
                 <hr class="mt-1 border-primary">
             </div>
 
-            <!-- Profil dan Dropdown Menu -->
             <div class="profile-dropdown position-absolute end-0 top-0 m-3">
                 <div class="d-flex align-items-center">
                     <span class="username me-2 small" style="font-size: 12px;">{{ Auth::user()->name }}</span>
@@ -378,14 +407,12 @@
 
 
 
-        <!-- Content Main -->
         @yield('content')
 
         <p class="p-3">© {{ date('Y') }}, made with by <a href="https://tipddev.com"><span class="fw-bold">TIPD Developer</span></a> for a better App.</p>
 
     </div>
 
-    <!-- JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // Toggle sidebar untuk mobile

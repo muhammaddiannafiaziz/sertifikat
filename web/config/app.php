@@ -134,47 +134,49 @@ return [
     |
     */
 
+    'providers' => [
 
-    // 'providers' => [
+        /*
+         * Laravel Framework Service Providers...
+         */
+        Illuminate\Auth\AuthServiceProvider::class,
+        Illuminate\Broadcasting\BroadcastServiceProvider::class,
+        Illuminate\Bus\BusServiceProvider::class,
+        Illuminate\Cache\CacheServiceProvider::class,
+        Illuminate\Foundation\Providers\ComposerServiceProvider::class,
+        Illuminate\Cookie\CookieServiceProvider::class, // (Pastikan ini ada jika belum)
+        Illuminate\Database\DatabaseServiceProvider::class,
+        Illuminate\Encryption\EncryptionServiceProvider::class, // (Pastikan ini ada jika belum)
+        Illuminate\Filesystem\FilesystemServiceProvider::class,
+        Illuminate\Foundation\Providers\FoundationServiceProvider::class, // (Pastikan ini ada jika belum)
+        Illuminate\Hashing\HashServiceProvider::class,
+        Illuminate\Mail\MailServiceProvider::class, // (Pastikan ini ada jika belum)
+        Illuminate\Notifications\NotificationServiceProvider::class, // (Pastikan ini ada jika belum)
+        Illuminate\Pagination\PaginationServiceProvider::class,
+        Illuminate\Pipeline\PipelineServiceProvider::class,
+        Illuminate\Queue\QueueServiceProvider::class,
+        Illuminate\Redis\RedisServiceProvider::class,
+        Illuminate\Auth\Passwords\PasswordResetServiceProvider::class, // (Pastikan ini ada jika belum)
+        Illuminate\Session\SessionServiceProvider::class,
+        Illuminate\Translation\TranslationServiceProvider::class,
+        Illuminate\Validation\ValidationServiceProvider::class,
+        Illuminate\View\ViewServiceProvider::class,
 
-    //     /*
-    //      * Laravel Framework Service Providers...
-    //      */
-    //     Illuminate\Auth\AuthServiceProvider::class,
-    //     Illuminate\Broadcasting\BroadcastServiceProvider::class,
-    //     Illuminate\Bus\BusServiceProvider::class,
-    //     Illuminate\Cache\CacheServiceProvider::class,
-    //     Illuminate\Foundation\Providers\ComposerServiceProvider::class,
-    //     Illuminate\Filesystem\FilesystemServiceProvider::class,
-    //     Illuminate\Pagination\PaginationServiceProvider::class,
-    //     Illuminate\Pipeline\PipelineServiceProvider::class,
-    //     Illuminate\Queue\QueueServiceProvider::class,
-    //     Illuminate\Redis\RedisServiceProvider::class,
-    //     Illuminate\Log\LogServiceProvider::class,
-    //     Illuminate\Database\DatabaseServiceProvider::class,
-    //     Illuminate\Events\EventServiceProvider::class,
-    //     Illuminate\Hashing\HashServiceProvider::class,
-    //     Illuminate\Session\SessionServiceProvider::class,
-    //     Illuminate\Translation\TranslationServiceProvider::class,
-    //     Illuminate\Validation\ValidationServiceProvider::class,
-    //     Illuminate\View\ViewServiceProvider::class,
+        /*
+         * Package Service Providers...
+         */
+        SimpleSoftwareIO\QrCode\QrCodeServiceProvider::class,  // WAJIB: Hapus komentar ini
+        Barryvdh\DomPDF\ServiceProvider::class,                 // WAJIB: Hapus komentar ini
 
-    //     /*
-    //      * Package Service Providers...
-    //      */
-    //     SimpleSoftwareIO\QrCode\QrCodeServiceProvider::class,  // Add this line for QR Code
-    //     Barryvdh\DomPDF\ServiceProvider::class,
+        /*
+         * Application Service Providers...
+         */
+        App\Providers\AppServiceProvider::class,
+        App\Providers\AuthServiceProvider::class, // Ini sudah benar
+        // App\Providers\EventServiceProvider::class,
+        // App\Providers\RouteServiceProvider::class,
 
-    //     /*
-    //      * Application Service Providers...
-    //      */
-
-    //     App\Providers\AppServiceProvider::class,
-    //     App\Providers\AuthServiceProvider::class,
-    //     App\Providers\EventServiceProvider::class,
-    //     App\Providers\RouteServiceProvider::class,
-
-    // ],
+    ],
 
     /*
     |----------------------------------------------------------------------

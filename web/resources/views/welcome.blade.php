@@ -38,7 +38,7 @@
                 <h2 class="mb-6">Cek Sertifikat</h2>
                 <p class="mb-4">Cek sertifikat dengan cara mengetikkan nim kemudian cari sertifikat lalu unduh sertifikat</p>
                 <!-- Tombol untuk membuka aplikasi pemindai -->
-                <a href="{{ route('cek-sertifikat')}}" target="_blank">
+                <a href="{{ route('public.cek')}}" target="_blank">
                     <button type="button" class="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                         Cek Sertifikat
                     </button>

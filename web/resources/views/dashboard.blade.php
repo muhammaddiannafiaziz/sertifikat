@@ -57,7 +57,7 @@
                             </p>
                             <div style="display: flex; align-items: center; gap: 10px;">
                                 <i class="fas fa-chalkboard-teacher" style="color: white; font-size: 30px;"></i>
-                                <p class="mt-3 fs-40" style="color: white; font-weight: bold; font-size: 40px;">{{ $totalSertifikat }}</p>
+                                <p class="mt-3 fs-40" style="color: white; font-weight: bold; font-size: 40px;">Total Sertifikat</p>
                             </div>
                         </div>
                     </div>
