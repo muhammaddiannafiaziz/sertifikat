@@ -5,10 +5,10 @@
 @section('content')
 <div class="container mt-5">
     <h1 class="text-center mb-4">Buat Data SKL Ma'had</h1>
-    <p class="text-center text-muted mb-4">Pilih mahasiswa dan masukkan status kelulusan SKL Ibadah & Al-Qur'an.</p>
+    <p class="text-center text-muted mb-4">Pilih peserta yang sudah terdaftar untuk penerbitan SKL Ibadah & Al-Qur'an.</p>
 
     @if ($errors->any())
-        <div class="alert alert-danger">
+        <div class="alert alert-danger" style="max-width: 600px; margin: auto; margin-bottom: 20px;">
             <strong>Whoops!</strong> Ada masalah dengan input Anda.<br><br>
             <ul>
                 @foreach ($errors->all() as $error)
@@ -22,21 +22,21 @@
         @csrf
 
         <div class="mb-4">
-            <label for="mahasiswa_id" class="form-label">Mahasiswa</label>
-            <select name="mahasiswa_id" id="mahasiswa_id" class="form-select @error('mahasiswa_id') is-invalid @enderror" required>
-                <option value="">Pilih Mahasiswa</option>
-                @forelse ($mahasiswa as $mhs)
-                <option value="{{ $mhs->id }}" {{ old('mahasiswa_id') == $mhs->id ? 'selected' : '' }}>
-                    {{ $mhs->nama }} ({{ $mhs->nim }})
+            <label for="mhsmahad_id" class="form-label">Peserta SKL</label>
+            <select name="mhsmahad_id" id="mhsmahad_id" class="form-select @error('mhsmahad_id') is-invalid @enderror" required>
+                <option value="">Pilih Peserta</option>
+                @forelse ($peserta as $pst) 
+                <option value="{{ $pst->id }}" {{ old('mhsmahad_id') == $pst->id ? 'selected' : '' }}>
+                    {{ $pst->mahasiswa->nama }} ({{ $pst->nim }})
                 </option>
                 @empty
-                <option value="" disabled>Semua mahasiswa sudah memiliki data SKL Ma'had.</option>
+                <option value="" disabled>Semua peserta sudah memiliki SKL atau belum ada peserta yang didaftarkan.</option>
                 @endforelse
             </select>
-            @error('mahasiswa_id')
+            @error('mhsmahad_id')
                 <div class="invalid-feedback">{{ $message }}</div>
             @enderror
-            <div class="form-text">Hanya menampilkan mahasiswa yang belum memiliki data SKL Ma'had.</div>
+            <div class="form-text">Hanya menampilkan Peserta yang sudah terdaftar dan belum memiliki SKL Ma'had.</div>
         </div>
 
         <div class="mb-4">

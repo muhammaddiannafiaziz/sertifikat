@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\SklTipd; // Model baru
+use App\Models\SklTipd;
+use App\Models\MhsTipd;
 use App\Models\Mahasiswa;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -17,7 +18,7 @@ class SklTipdController extends Controller
      */
     public function index(Request $request)
     {
-        $query = SklTipd::with('mahasiswa');
+        $query = SklTipd::with('mhsTipd.mahasiswa');
 
         // Logika Pencarian
         if ($request->has('search') && $request->input('search') != '') {
@@ -39,11 +40,10 @@ class SklTipdController extends Controller
      */
     public function create()
     {
-        // Ambil hanya mahasiswa yang BELUM punya data SKL TIPD
-        $mahasiswa = Mahasiswa::whereDoesntHave('sklTipd')->get();
+        // 1. Ganti: Ambil dari MhsTipd, bukan Mahasiswa
+        $peserta = MhsTipd::whereDoesntHave('sklTipd')->with('mahasiswa')->get();
         
-        // Arahkan ke view baru
-        return view('skl_tipd.create', compact('mahasiswa'));
+        return view('skl_tipd.create', compact('peserta')); // Mengirimkan $peserta
     }
 
     /**
@@ -51,29 +51,32 @@ class SklTipdController extends Controller
      */
     public function store(Request $request)
     {
-        // 1. Validasi Input
+        // 1. Validasi Input (Ganti: Validasi mhstipd_id)
         $validated = $request->validate([
-            'mahasiswa_id' => 'required|exists:mahasiswas,id|unique:skl_tipd,mahasiswa_id',
-            // SKL Komputer
+            'mhstipd_id' => 'required|exists:mhstipd,id|unique:skl_tipd,mhstipd_id',
             'word' => 'nullable|integer|min:1|max:999',
             'excel' => 'nullable|integer|min:1|max:999',
             'power_point' => 'nullable|integer|min:1|max:999',
         ]);
 
-        // 2. Cari Mahasiswa (untuk data NIM & Prodi)
-        $mahasiswa = Mahasiswa::find($validated['mahasiswa_id']);
+        // 2. Cari Data Peserta (MhsTipd)
+        $peserta = MhsTipd::with('mahasiswa')->find($validated['mhstipd_id']);
 
-        // 3. Generate Nomor Sertifikat Unik (Sesuai permintaan Anda)
-        $no_sertifikat = 'SERT-KOMP-' . date('Y') . '-' . strtoupper(Str::substr($mahasiswa->program_studi, 0, 3)) . '-' . $mahasiswa->nim;
+        // 3. Generate Nomor Sertifikat Unik
+        $nim = $peserta->mahasiswa->nim;
+        $prodi = $peserta->mahasiswa->program_studi;
+        $no_sertifikat = 'SERT-KOMP-' . date('Y') . '-' . strtoupper(Str::substr($prodi, 0, 3)) . '-' . $nim;
 
-        // 4. Generate & Simpan QR Code
-        $validationUrl = route('public.validasi', $no_sertifikat);
+        // 4. Generate & Simpan QR Code (Gunakan rute generik)
+        $validationUrl = route('public.validasi', $no_sertifikat); 
         $qrCodeImage = QrCode::format('png')->size(200)->generate($validationUrl);
         $qrCodePath = 'qr-codes/tipd/qrcode_' . $no_sertifikat . '.png';
         Storage::disk('public')->put($qrCodePath, $qrCodeImage);
 
-        // 5. Simpan data ke Database
+        // 5. Simpan data ke Database (menggunakan ID Peserta)
         $validated['no_sertifikat'] = $no_sertifikat;
+        $validated['mhstipd_id'] = $validated['mhstipd_id']; // Pastikan ID Peserta masuk
+        
         SklTipd::create($validated);
 
         // 6. Redirect kembali ke index

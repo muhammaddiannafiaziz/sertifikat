@@ -12,6 +12,9 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\PublicSertifikatController;
+use App\Http\Controllers\PesertaMahadController;
+use App\Http\Controllers\PesertaBahasaController;
+use App\Http\Controllers\PesertaTipdController;
 // use App\Http\Controllers\SertifikatController; // Dikomentari untuk refaktor
 
 
@@ -141,6 +144,29 @@ Route::middleware('auth')->group(function () {
 
     // Rute SKL TIPD (Hanya bisa diakses oleh 'admintipd' & 'superadmin')
     Route::resource('skl-tipd', SklTipdController::class)
+         ->middleware('can:manage-tipd');
+
+    // ===================================
+    // ==     RUTE PESERTA BARU           ==
+    // ===================================
+
+    // Rute Peserta SKL Ma'had
+    Route::resource('peserta-mahad', PesertaMahadController::class)
+         ->middleware('can:manage-mahad');
+    // Tambahkan rute Import (Wajib)
+    Route::post('peserta-mahad/import', [PesertaMahadController::class, 'import'])->name('peserta-mahad.import')
+         ->middleware('can:manage-mahad');
+         
+    // Rute Peserta SKL Bahasa
+    Route::resource('peserta-bahasa', PesertaBahasaController::class)
+         ->middleware('can:manage-bahasa');
+    Route::post('peserta-bahasa/import', [PesertaBahasaController::class, 'import'])->name('peserta-bahasa.import')
+         ->middleware('can:manage-bahasa');
+
+    // Rute Peserta SKL TIPD
+    Route::resource('peserta-tipd', PesertaTipdController::class)
+         ->middleware('can:manage-tipd');
+    Route::post('peserta-tipd/import', [PesertaTipdController::class, 'import'])->name('peserta-tipd.import')
          ->middleware('can:manage-tipd');
 
 });

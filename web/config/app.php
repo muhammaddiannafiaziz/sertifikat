@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Foundation\Providers\ConsoleSupportServiceProvider;
+
 return [
 
     /*
@@ -148,6 +150,7 @@ return [
         Illuminate\Database\DatabaseServiceProvider::class,
         Illuminate\Encryption\EncryptionServiceProvider::class, // (Pastikan ini ada jika belum)
         Illuminate\Filesystem\FilesystemServiceProvider::class,
+        Illuminate\Foundation\Providers\ConsoleSupportServiceProvider::class,
         Illuminate\Foundation\Providers\FoundationServiceProvider::class, // (Pastikan ini ada jika belum)
         Illuminate\Hashing\HashServiceProvider::class,
         Illuminate\Mail\MailServiceProvider::class, // (Pastikan ini ada jika belum)

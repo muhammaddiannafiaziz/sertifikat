@@ -9,30 +9,22 @@ class SklMahad extends Model
 {
     use HasFactory;
 
-    /**
-     * Nama tabel yang terhubung dengan model.
-     *
-     * @var string
-     */
     protected $table = 'skl_mahad';
 
-    /**
-     * Atribut yang boleh diisi secara massal (mass assignable).
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
-        'mahasiswa_id',
+        'mhsmahad_id', // <-- BERUBAH: Gunakan ID Peserta
         'no_sertifikat',
         'status_ujian_ibadah',
         'status_ujian_alquran',
     ];
 
+    // Ganti relasi Mahasiswa() menjadi mhsMahad()
+
     /**
-     * Mendapatkan data mahasiswa yang memiliki SKL Ma'had ini.
+     * Mendapatkan data peserta (MhsMahad) yang menerbitkan SKL ini.
      */
-    public function mahasiswa()
+    public function mhsMahad()
     {
-        return $this->belongsTo(Mahasiswa::class);
+        return $this->belongsTo(MhsMahad::class, 'mhsmahad_id');
     }
 }

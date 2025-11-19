@@ -9,51 +9,37 @@ class Mahasiswa extends Model
 {
     use HasFactory;
 
-    // Izinkan atribut berikut untuk mass assignment
     protected $fillable = [
         'nama',
         'nim',
         'program_studi',
         'fakultas',
-        'email'
+        'email',
     ];
 
-    /**
-     * Mendapatkan data SKL Ma'had yang dimiliki oleh mahasiswa.
-     */
-    public function sklMahad()
-    {
-        return $this->hasOne(SklMahad::class);
-    }
+    // Relasi ke Tabel Peserta (melalui kolom 'nim')
 
     /**
-     * Mendapatkan data SKL Bahasa yang dimiliki oleh mahasiswa.
+     * Mendapatkan data peserta SKL Ma'had (jika ada).
      */
-    public function sklBahasa()
+    public function mhsMahad()
     {
-        return $this->hasOne(SklBahasa::class);
+        return $this->hasOne(MhsMahad::class, 'nim', 'nim');
     }
 
     /**
-     * Mendapatkan data SKL TIPD yang dimiliki oleh mahasiswa.
+     * Mendapatkan data peserta SKL Bahasa (jika ada).
      */
-    public function sklTipd()
+    public function mhsBahasa()
     {
-        return $this->hasOne(SklTipd::class);
+        return $this->hasOne(MhsBahasa::class, 'nim', 'nim');
     }
 
-    // Relasi Many-to-Many dengan Ujian
-    public function ujian()
+    /**
+     * Mendapatkan data peserta SKL TIPD (jika ada).
+     */
+    public function mhsTipd()
     {
-        return $this->belongsToMany(Ujian::class, 'mahasiswa_ujian');
-    }
-
-    public function index()
-    {
-        // Mengambil total mahasiswa
-        $totalMahasiswa = Mahasiswa::totalMahasiswa();
-
-        // Mengirimkan data ke view
-        return view('dashboard', compact('totalMahasiswa'));
+        return $this->hasOne(MhsTipd::class, 'nim', 'nim');
     }
 }

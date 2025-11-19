@@ -324,14 +324,34 @@
             </li>
             @endcan
             
-            {{-- 
+            @can('manage-mahad')
             <li class="nav-item">
-                <a class="nav-link {{ request()->routeIs('sertifikat.index') ? 'active' : '' }}" href="{{ route('sertifikat.index') }}">
-                    <i class="bi bi-file-earmark-text menu-icon"></i>
-                    <span class="px-2 menu-title">Sertifikat</span>
+                <a class="nav-link {{ request()->routeIs('peserta-mahad.*') ? 'active' : '' }}" href="{{ route('peserta-mahad.index') }}">
+                    <i class="bi bi-person-lines-fill menu-icon"></i>
+                    <span class="px-2 menu-title">Peserta Ma'had</span>
                 </a>
-            </li> 
-            --}}
+            </li>
+            @endcan
+            
+            @can('manage-bahasa')
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('peserta-bahasa.*') ? 'active' : '' }}" href="{{ route('peserta-bahasa.index') }}">
+                    <i class="bi bi-people menu-icon"></i>
+                    <span class="px-2 menu-title">Peserta Bahasa</span>
+                </a>
+            </li>
+            @endcan
+            
+            @can('manage-tipd')
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('peserta-tipd.*') ? 'active' : '' }}" href="{{ route('peserta-tipd.index') }}">
+                    <i class="bi bi-pc-display-horizontal menu-icon"></i>
+                    <span class="px-2 menu-title">Peserta Komputer</span>
+                </a>
+            </li>
+            @endcan
+            
+            <li class="nav-item border-bottom-0"> </li>
 
             @can('manage-mahad')
             <li class="nav-item">
@@ -341,7 +361,6 @@
                 </a>
             </li>
             @endcan
-
             @can('manage-bahasa')
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('skl-bahasa.*') ? 'active' : '' }}" href="{{ route('skl-bahasa.index') }}">
@@ -369,7 +388,7 @@
             </li>
             @endcan
         </ul>
-        </nav>
+    </nav>
 
     <div class="main-content">
 

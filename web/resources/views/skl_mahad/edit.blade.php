@@ -23,7 +23,7 @@
             <label for="mahasiswa_id" class="form-label">Mahasiswa</label>
             <input type="text" 
                    class="form-control" 
-                   value="{{ $sklMahad->mahasiswa->nama }} ({{ $sklMahad->mahasiswa->nim }})" 
+                   value="{{ $sklMahad->mhsMahad->mahasiswa->nama }} ({{ $sklMahad->mhsMahad->mahasiswa->nim }})" 
                    disabled readonly>
             <div class="form-text">Data mahasiswa tidak dapat diubah.</div>
         </div>

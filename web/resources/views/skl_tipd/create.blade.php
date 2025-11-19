@@ -5,7 +5,7 @@
 @section('content')
 <div class="container mt-5">
     <h1 class="text-center mb-4">Buat Data SKL Komputer</h1>
-    <p class="text-center text-muted mb-4">Pilih mahasiswa dan masukkan nilai untuk SKL Komputer.</p>
+    <p class="text-center text-muted mb-4">Pilih peserta yang sudah terdaftar untuk penerbitan SKL Komputer.</p>
 
     @if ($errors->any())
         <div class="alert alert-danger" style="max-width: 700px; margin: auto; margin-bottom: 20px;">
@@ -22,21 +22,21 @@
         @csrf
 
         <div class="mb-4">
-            <label for="mahasiswa_id" class="form-label">Mahasiswa</label>
-            <select name="mahasiswa_id" id="mahasiswa_id" class="form-select @error('mahasiswa_id') is-invalid @enderror" required>
-                <option value="">Pilih Mahasiswa</option>
-                @forelse ($mahasiswa as $mhs)
-                <option value="{{ $mhs->id }}" {{ old('mahasiswa_id') == $mhs->id ? 'selected' : '' }}>
-                    {{ $mhs->nama }} ({{ $mhs->nim }})
+            <label for="mhstipd_id" class="form-label">Peserta SKL</label>
+            <select name="mhstipd_id" id="mhstipd_id" class="form-select @error('mhstipd_id') is-invalid @enderror" required>
+                <option value="">Pilih Peserta</option>
+                @forelse ($peserta as $pst) 
+                <option value="{{ $pst->id }}" {{ old('mhstipd_id') == $pst->id ? 'selected' : '' }}>
+                    {{ $pst->mahasiswa->nama }} ({{ $pst->nim }})
                 </option>
                 @empty
-                <option value="" disabled>Semua mahasiswa sudah memiliki data SKL Komputer.</option>
+                <option value="" disabled>Semua peserta sudah memiliki SKL atau belum ada peserta yang didaftarkan.</option>
                 @endforelse
             </select>
-            @error('mahasiswa_id')
+            @error('mhstipd_id')
                 <div class="invalid-feedback">{{ $message }}</div>
             @enderror
-            <div class="form-text">Hanya menampilkan mahasiswa yang belum memiliki data SKL Komputer.</div>
+            <div class="form-text">Hanya menampilkan Peserta yang sudah terdaftar dan belum memiliki SKL Komputer.</div>
         </div>
 
         <hr class="my-4">

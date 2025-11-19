@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\SklBahasa; // Model baru
+use App\Models\SklBahasa;
+use App\Models\MhsBahasa;
 use App\Models\Mahasiswa;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -17,12 +18,12 @@ class SklBahasaController extends Controller
      */
     public function index(Request $request)
     {
-        $query = SklBahasa::with('mahasiswa');
+        $query = SklBahasa::with('mhsBahasa.mahasiswa');
 
         // Logika Pencarian
         if ($request->has('search') && $request->input('search') != '') {
             $search = $request->input('search');
-            $query->whereHas('mahasiswa', function ($q) use ($search) {
+            $query->whereHas('mhsBahasa.mahasiswa', function ($q) use ($search) {
                 $q->where('nama', 'like', "%{$search}%")
                   ->orWhere('nim', 'like', "%{$search}%");
             })->orWhere('no_sertifikat', 'like', "%{$search}%");
@@ -39,11 +40,10 @@ class SklBahasaController extends Controller
      */
     public function create()
     {
-        // Ambil hanya mahasiswa yang BELUM punya data SKL Bahasa
-        $mahasiswa = Mahasiswa::whereDoesntHave('sklBahasa')->get();
+        // 1. Ganti: Ambil dari MhsBahasa, bukan Mahasiswa
+        $peserta = MhsBahasa::whereDoesntHave('sklBahasa')->with('mahasiswa')->get();
         
-        // Arahkan ke view baru
-        return view('skl_bahasa.create', compact('mahasiswa'));
+        return view('skl_bahasa.create', compact('peserta')); // Mengirimkan $peserta
     }
 
     /**
@@ -51,35 +51,35 @@ class SklBahasaController extends Controller
      */
     public function store(Request $request)
     {
-        // 1. Validasi Input
+        // 1. Validasi Input (Ganti: Validasi mhsbahasa_id)
         $validated = $request->validate([
-            'mahasiswa_id' => 'required|exists:mahasiswas,id|unique:skl_bahasa,mahasiswa_id',
-            // SKL Bahasa Arab
+            'mhsbahasa_id' => 'required|exists:mhsbahasa,id|unique:skl_bahasa,mhsbahasa_id',
             'istima' => 'nullable|integer|min:1|max:999',
             'kitabah' => 'nullable|integer|min:1|max:999',
             'qiraah' => 'nullable|integer|min:1|max:999',
-            // SKL Bahasa Inggris
             'listening' => 'nullable|integer|min:1|max:999',
             'writing' => 'nullable|integer|min:1|max:999',
             'reading' => 'nullable|integer|min:1|max:999',
         ]);
 
-        // 2. Cari Mahasiswa (untuk data NIM & Prodi)
-        $mahasiswa = Mahasiswa::find($validated['mahasiswa_id']);
+        // 2. Cari Data Peserta (MhsBahasa)
+        $peserta = MhsBahasa::with('mahasiswa')->find($validated['mhsbahasa_id']);
 
-        // 3. Generate Nomor Sertifikat Unik (Sesuai permintaan Anda)
-        $no_sertifikat = 'SERT-TOSA-TOSE-' . date('Y') . '-' . strtoupper(Str::substr($mahasiswa->program_studi, 0, 3)) . '-' . $mahasiswa->nim;
+        // 3. Generate Nomor Sertifikat Unik
+        $nim = $peserta->mahasiswa->nim;
+        $prodi = $peserta->mahasiswa->program_studi;
+        $no_sertifikat = 'SERT-TOSA-TOSE-' . date('Y') . '-' . strtoupper(Str::substr($prodi, 0, 3)) . '-' . $nim;
 
-        // 4. Generate & Simpan QR Code
-        // BARU:
-        $validationUrl = route('public.validasi', $no_sertifikat);
+        // 4. Generate & Simpan QR Code (Gunakan rute generik)
+        $validationUrl = route('public.validasi', $no_sertifikat); 
         $qrCodeImage = QrCode::format('png')->size(200)->generate($validationUrl);
         $qrCodePath = 'qr-codes/bahasa/qrcode_' . $no_sertifikat . '.png';
         Storage::disk('public')->put($qrCodePath, $qrCodeImage);
 
-        // 5. Simpan data ke Database
-        // Gabungkan no_sertifikat ke data tervalidasi
+        // 5. Simpan data ke Database (menggunakan ID Peserta)
         $validated['no_sertifikat'] = $no_sertifikat;
+        $validated['mhsbahasa_id'] = $validated['mhsbahasa_id']; // Pastikan ID Peserta masuk
+        
         SklBahasa::create($validated);
 
         // 6. Redirect kembali ke index
@@ -92,7 +92,7 @@ class SklBahasaController extends Controller
     public function show(SklBahasa $sklBahasa) // Route-Model Binding
     {
         // $sklBahasa sudah otomatis diambil
-        $sklBahasa->load('mahasiswa');
+        $sklBahasa->load('mhsBahasa.mahasiswa');
 
         // Buat URL QR Code untuk ditampilkan di view
         $qrCodePath = 'qr-codes/bahasa/qrcode_' . $sklBahasa->no_sertifikat . '.png';

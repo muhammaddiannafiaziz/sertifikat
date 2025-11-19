@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\SklMahad; // Model baru
+use App\Models\SklMahad;
+use App\Models\MhsMahad;
 use App\Models\Mahasiswa;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -17,7 +18,7 @@ class SklMahadController extends Controller
      */
     public function index(Request $request)
     {
-        $query = SklMahad::with('mahasiswa');
+        $query = SklMahad::with('mhsMahad.mahasiswa');
 
         // Logika Pencarian
         if ($request->has('search') && $request->input('search') != '') {
@@ -39,11 +40,12 @@ class SklMahadController extends Controller
      */
     public function create()
     {
-        // Ambil hanya mahasiswa yang BELUM punya data SKL Ma'had
-        $mahasiswa = Mahasiswa::whereDoesntHave('sklMahad')->get();
+        // 1. Ganti: Ambil dari MhsMahad, bukan Mahasiswa
+        // 2. Ambil hanya peserta yang BELUM punya data SKL Ma'had
+        $peserta = MhsMahad::whereDoesntHave('sklMahad')->with('mahasiswa')->get();
         
         // Arahkan ke view baru
-        return view('skl_mahad.create', compact('mahasiswa'));
+        return view('skl_mahad.create', compact('peserta')); // Mengirimkan $peserta
     }
 
     /**
@@ -53,26 +55,31 @@ class SklMahadController extends Controller
     {
         // 1. Validasi Input
         $validated = $request->validate([
-            'mahasiswa_id' => 'required|exists:mahasiswas,id|unique:skl_mahad,mahasiswa_id',
+            // Ganti: Validasi mhsmahad_id
+            'mhsmahad_id' => 'required|exists:mhsmahad,id|unique:skl_mahad,mhsmahad_id',
             'status_ujian_ibadah' => 'required|in:lulus,tidak_lulus',
             'status_ujian_alquran' => 'required|in:lulus,tidak_lulus',
         ]);
 
-        // 2. Cari Mahasiswa (untuk data NIM & Prodi)
-        $mahasiswa = Mahasiswa::find($validated['mahasiswa_id']);
+        // 2. Cari Data Peserta (MhsMahad)
+        // Kita gunakan relasi mhsMahad->mahasiswa untuk mendapatkan NIM & Prodi
+        $peserta = MhsMahad::with('mahasiswa')->find($validated['mhsmahad_id']);
 
-        // 3. Generate Nomor Sertifikat Unik (Sesuai permintaan Anda)
-        $no_sertifikat = 'SERT-IBD-QRN-' . date('Y') . '-' . strtoupper(Str::substr($mahasiswa->program_studi, 0, 3)) . '-' . $mahasiswa->nim;
+        // 3. Generate Nomor Sertifikat Unik (menggunakan NIM dari data master)
+        $nim = $peserta->mahasiswa->nim;
+        $prodi = $peserta->mahasiswa->program_studi;
+        $no_sertifikat = 'SERT-IBD-QRN-' . date('Y') . '-' . strtoupper(Str::substr($prodi, 0, 3)) . '-' . $nim;
 
-        // 4. Generate & Simpan QR Code
-        $validationUrl = route('public.validasi', $no_sertifikat);
+
+        // 4. Generate & Simpan QR Code (Gunakan rute generik)
+        $validationUrl = route('public.validasi', $no_sertifikat); 
         $qrCodeImage = QrCode::format('png')->size(200)->generate($validationUrl);
         $qrCodePath = 'qr-codes/mahad/qrcode_' . $no_sertifikat . '.png';
         Storage::disk('public')->put($qrCodePath, $qrCodeImage);
 
-        // 5. Simpan data ke Database
+        // 5. Simpan data ke Database (menggunakan ID Peserta)
         SklMahad::create([
-            'mahasiswa_id' => $validated['mahasiswa_id'],
+            'mhsmahad_id' => $validated['mhsmahad_id'],
             'no_sertifikat' => $no_sertifikat,
             'status_ujian_ibadah' => $validated['status_ujian_ibadah'],
             'status_ujian_alquran' => $validated['status_ujian_alquran'],

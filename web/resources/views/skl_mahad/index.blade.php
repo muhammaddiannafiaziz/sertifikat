@@ -56,8 +56,8 @@
                 @forelse($sklMahadData as $index => $data)
                 <tr>
                     <td>{{ $sklMahadData->firstItem() + $index }}</td>
-                    <td>{{ $data->mahasiswa->nama }}</td>
-                    <td>{{ $data->mahasiswa->nim }}</td>
+                    <td>{{ $data->mhsMahad->mahasiswa->nama }}</td>
+                    <td>{{ $data->mhsMahad->mahasiswa->nim }}</td>
                     <td>{{ $data->no_sertifikat }}</td>
                     <td>
                         @if($data->status_ujian_ibadah == 'lulus')

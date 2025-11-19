@@ -19,11 +19,12 @@
 
     <form action="{{ route('skl-tipd.update', $sklTipd->id) }}" method="POST" class="card shadow-sm p-4" style="max-width: 700px; margin: auto;">
         @csrf
-        @method('PUT') <div class="mb-4">
+        @method('PUT') 
+        <div class="mb-4">
             <label for="mahasiswa_id" class="form-label">Mahasiswa</label>
             <input type="text" 
                    class="form-control" 
-                   value="{{ $sklTipd->mahasiswa->nama }} ({{ $sklTipd->mahasiswa->nim }})" 
+                   value="{{ $sklTipd->mhsTipd->mahasiswa->nama }} ({{ $sklTipd->mhsTipd->mahasiswa->nim }})" 
                    disabled readonly>
             <div class="form-text">Data mahasiswa tidak dapat diubah.</div>
         </div>

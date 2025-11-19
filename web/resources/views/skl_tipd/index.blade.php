@@ -55,8 +55,8 @@
                 @forelse($sklTipdData as $index => $data)
                 <tr>
                     <td>{{ $sklTipdData->firstItem() + $index }}</td>
-                    <td>{{ $data->mahasiswa->nama }}</td>
-                    <td>{{ $data->mahasiswa->nim }}</td>
+                    <td>{{ $data->mhsTipd->mahasiswa->nama }}</td>
+                    <td>{{ $data->mhsTipd->mahasiswa->nim }}</td>
                     <td>{{ $data->no_sertifikat }}</td>
                     <td>
                         @if($data->word || $data->excel || $data->power_point)

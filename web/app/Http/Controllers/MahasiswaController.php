@@ -15,9 +15,12 @@ class MahasiswaController extends Controller
         // Mendapatkan parameter pencarian dari inputan user
         $search = $request->query('search');
 
+        // Gunakan Mahasiswa::query() untuk memulai builder
+        $query = Mahasiswa::query();
+
         // Jika ada pencarian, filter data mahasiswa berdasarkan nama, nim, atau email
         if ($search) {
-            $mahasiswa = Mahasiswa::with('ujian')
+            $mahasiswa = $query
                 ->where('nama', 'like', "%{$search}%")
                 ->orWhere('nim', 'like', "%{$search}%")
                 ->orWhere('email', 'like', "%{$search}%")
@@ -25,8 +28,8 @@ class MahasiswaController extends Controller
                 ->orWhere('fakultas', 'like', "%{$search}%")
                 ->paginate(50);
         } else {
-            // Jika tidak ada pencarian, ambil semua data mahasiswa dengan relasi ujian
-            $mahasiswa = Mahasiswa::with('ujian')->paginate(50);
+            // Jika tidak ada pencarian, ambil semua data mahasiswa (TANPA relasi ujian)
+            $mahasiswa = $query->paginate(50);
         }
 
         return view('mahasiswa.index', compact('mahasiswa'));
@@ -53,8 +56,7 @@ class MahasiswaController extends Controller
 
     public function show(Mahasiswa $mahasiswa)
     {
-        // return view('mahasiswa.show', compact('mahasiswa'));
-        $mahasiswa->load('ujian');
+        // Hapus: $mahasiswa->load('ujian');
         return view('mahasiswa.show', compact('mahasiswa'));
     }
 
@@ -114,7 +116,8 @@ class MahasiswaController extends Controller
         // Kembalikan response untuk download file CSV
         return response()->stream(
             function () use ($handle) {
-                fclose($handle);  // Pastikan handle ditutup dalam closure
+                // Hapus baris ini karena handle sudah ditutup di luar closure
+                // fclose($handle);  // Pastikan handle ditutup dalam closure
             },
             200,
             $headers
@@ -148,7 +151,7 @@ class MahasiswaController extends Controller
                 // Coba untuk insert mahasiswa baru
                 Mahasiswa::create([
                     'nama' => $row[0], // Nama
-                    'nim' => $row[1],  // NIM
+                    'nim' => $row[1], // NIM
                     'program_studi' => $row[2], // Program Studi
                     'fakultas' => $row[3], // Fakultas
                     'email' => $row[4], // Email
@@ -165,6 +168,8 @@ class MahasiswaController extends Controller
         return back()->with('success', 'Data mahasiswa berhasil diimport!');
     }
 
+    // Hapus fungsi addUjian karena fitur ujian telah dihapus
+    /*
     public function addUjian(Mahasiswa $mahasiswa, Request $request)
     {
         // Validasi input ujian
@@ -177,4 +182,5 @@ class MahasiswaController extends Controller
 
         return redirect()->route('mahasiswa.show', $mahasiswa->id)->with('success', 'Ujian berhasil ditambahkan!');
     }
+    */
 }

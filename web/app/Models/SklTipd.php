@@ -12,18 +12,13 @@ class SklTipd extends Model
     protected $table = 'skl_tipd';
 
     protected $fillable = [
-        'mahasiswa_id',
+        'mhstipd_id', // <-- BERUBAH
         'no_sertifikat',
-        'word',
-        'excel',
-        'power_point',
+        'word', 'excel', 'power_point',
     ];
 
-    /**
-     * Mendapatkan data mahasiswa yang memiliki SKL TIPD ini.
-     */
-    public function mahasiswa()
+    public function mhsTipd()
     {
-        return $this->belongsTo(Mahasiswa::class);
+        return $this->belongsTo(MhsTipd::class, 'mhstipd_id');
     }
 }

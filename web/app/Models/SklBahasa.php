@@ -12,21 +12,14 @@ class SklBahasa extends Model
     protected $table = 'skl_bahasa';
 
     protected $fillable = [
-        'mahasiswa_id',
+        'mhsbahasa_id', // <-- BERUBAH
         'no_sertifikat',
-        'istima',
-        'kitabah',
-        'qiraah',
-        'listening',
-        'writing',
-        'reading',
+        'istima', 'kitabah', 'qiraah',
+        'listening', 'writing', 'reading',
     ];
 
-    /**
-     * Mendapatkan data mahasiswa yang memiliki SKL Bahasa ini.
-     */
-    public function mahasiswa()
+    public function mhsBahasa()
     {
-        return $this->belongsTo(Mahasiswa::class);
+        return $this->belongsTo(MhsBahasa::class, 'mhsbahasa_id');
     }
 }

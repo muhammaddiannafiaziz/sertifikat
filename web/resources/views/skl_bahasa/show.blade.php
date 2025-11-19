@@ -11,19 +11,19 @@
             <div class="mb-4">
                 <div class="row mb-2">
                     <div class="col-md-4"><strong>Nama:</strong></div>
-                    <div class="col-md-8">{{ $sklBahasa->mahasiswa->nama }}</div>
+                    <div class="col-md-8">{{ $sklBahasa->mhsBahasa->mahasiswa->nama }}</div>
                 </div>
                 <div class="row mb-2">
                     <div class="col-md-4"><strong>NIM:</strong></div>
-                    <div class="col-md-8">{{ $sklBahasa->mahasiswa->nim }}</div>
+                    <div class="col-md-8">{{ $sklBahasa->mhsBahasa->mahasiswa->nim }}</div>
                 </div>
                 <div class="row mb-2">
                     <div class="col-md-4"><strong>Program Studi:</strong></div>
-                    <div class="col-md-8">{{ $sklBahasa->mahasiswa->program_studi }}</div>
+                    <div class="col-md-8">{{ $sklBahasa->mhsBahasa->mahasiswa->program_studi }}</div>
                 </div>
                 <div class="row mb-2">
                     <div class="col-md-4"><strong>Fakultas:</strong></div>
-                    <div class="col-md-8">{{ $sklBahasa->mahasiswa->fakultas }}</div>
+                    <div class="col-md-8">{{ $sklBahasa->mhsBahasa->mahasiswa->fakultas }}</div>
                 </div>
             </div>
 

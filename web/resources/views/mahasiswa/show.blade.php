@@ -33,17 +33,6 @@
                 <p>{{ $mahasiswa->email }}</p>
             </div>
 
-            <div class="mb-3">
-                <strong class="text-dark">Ujian yang Diikuti:</strong>
-                <ul>
-                    @forelse ($mahasiswa->ujian as $ujian)
-                    <li>{{ $ujian->nama_ujian }} - {{ $ujian->deskripsi_ujian }}</li>
-                    @empty
-                    <p>Mahasiswa ini belum mengikuti ujian.</p>
-                    @endforelse
-                </ul>
-            </div>
-
             <a href="{{ route('mahasiswa.index') }}" class="btn btn-primary">Kembali ke Daftar Mahasiswa</a>
         </div>
     </div>

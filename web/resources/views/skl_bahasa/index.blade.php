@@ -56,8 +56,8 @@
                 @forelse($sklBahasaData as $index => $data)
                 <tr>
                     <td>{{ $sklBahasaData->firstItem() + $index }}</td>
-                    <td>{{ $data->mahasiswa->nama }}</td>
-                    <td>{{ $data->mahasiswa->nim }}</td>
+                    <td>{{ $data->mhsBahasa->mahasiswa->nama }}</td>
+                    <td>{{ $data->mhsBahasa->mahasiswa->nim }}</td>
                     <td>{{ $data->no_sertifikat }}</td>
                     <td>
                         @if($data->istima || $data->kitabah || $data->qiraah)
