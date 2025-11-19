@@ -9,7 +9,7 @@
         .page { width: 297mm; height: 210mm; position: relative; page-break-after: always; }
         .page:last-child { page-break-after: avoid; }
 
-        /* Backgrounds (sesuai file lama Anda) */
+        /* Backgrounds */
         .bg-ibadah {
             background: url('data:image/jpeg;base64,{{ base64_encode(file_get_contents(public_path("storage/backgrounds/bgsklibadah.png"))) }}') no-repeat center center;
             background-size: cover;
@@ -21,7 +21,7 @@
 
         .content { text-align: center; color: #000; padding: 20mm; position: relative; }
         
-        /* Posisi Teks (sesuai file lama Anda) */
+        /* Posisi Teks */
         .details {
             font-size: 18px;
             line-height: 0.5;
@@ -30,7 +30,7 @@
             margin-top: 70mm;
         }
 
-        /* Posisi QR Code (sesuai file lama Anda) */
+        /* Posisi QR Code */
         .qr-code {
             position: absolute;
             bottom: 10mm;
@@ -50,9 +50,9 @@
                 <div class="details">
                     <p><strong>{{ $data->no_sertifikat }}</strong></p>
                     <br>
-                    <p><strong>Nama:</strong> {{ $data->mahasiswa->nama }}</p>
-                    <p><strong>Program Studi:</strong> {{ $data->mahasiswa->program_studi }}</p>
-                    <p><strong>NIM:</strong> {{ $data->mahasiswa->nim }}</p>
+                    <p><strong>Nama:</strong> {{ $data->mhsMahad->mahasiswa->nama }}</p>
+                    <p><strong>Program Studi:</strong> {{ $data->mhsMahad->mahasiswa->program_studi }}</p>
+                    <p><strong>NIM:</strong> {{ $data->mhsMahad->mahasiswa->nim }}</p>
                     <br>
                     <p><strong>DINYATAKAN LULUS</strong></p>
                     <p>TES SKL IBADAH UIN RADEN MAS SAID SURAKARTA</p>
@@ -70,9 +70,9 @@
                 <div class="details">
                     <p><strong>{{ $data->no_sertifikat }}</strong></p>
                     <br>
-                    <p><strong>Nama:</strong> {{ $data->mahasiswa->nama }}</p>
-                    <p><strong>Program Studi:</strong> {{ $data->mahasiswa->program_studi }}</p>
-                    <p><strong>NIM:</strong> {{ $data->mahasiswa->nim }}</p>
+                    <p><strong>Nama:</strong> {{ $data->mhsMahad->mahasiswa->nama }}</p>
+                    <p><strong>Program Studi:</strong> {{ $data->mhsMahad->mahasiswa->program_studi }}</p>
+                    <p><strong>NIM:</strong> {{ $data->mhsMahad->mahasiswa->nim }}</p>
                     <br>
                     <p><strong>DINYATAKAN LULUS</strong></p>
                     <p>TES SKL ALQUR'AN UIN RADEN MAS SAID SURAKARTA</p>

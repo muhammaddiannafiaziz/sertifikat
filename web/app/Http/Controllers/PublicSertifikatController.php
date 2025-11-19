@@ -4,12 +4,12 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Mahasiswa;
-use App\Models\SklMahad; 
-use App\Models\SklBahasa; 
-use App\Models\SklTipd;    
-use Illuminate\Support\Facades\App; 
-use SimpleSoftwareIO\QrCode\Facades\QrCode; 
-use PDF; 
+use App\Models\SklMahad;
+use App\Models\SklBahasa;
+use App\Models\SklTipd;
+use Illuminate\Support\Facades\App;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use PDF;
 
 class PublicSertifikatController extends Controller
 {
@@ -18,7 +18,6 @@ class PublicSertifikatController extends Controller
      */
     public function showCheckForm()
     {
-        // Arahkan ke view baru yang akan kita buat
         return view('frontend.cek_nim');
     }
 
@@ -29,39 +28,51 @@ class PublicSertifikatController extends Controller
     {
         // 1. Validasi input
         $request->validate([
-            'nim' => 'required|string|max:9' // Sesuaikan max jika perlu
+            'nim' => 'required|string|max:20' // Sesuaikan max length
         ]);
 
         $nim = $request->input('nim');
 
-        // 2. Cari Mahasiswa berdasarkan NIM
-        $mahasiswa = Mahasiswa::with(['sklMahad', 'sklBahasa', 'sklTipd'])
-                              ->where('nim', $nim)
-                              ->first();
+        // 2. Cari Mahasiswa berdasarkan NIM dengan RELASI BERTINGKAT
+        // Kita perlu memuat:
+        // - mhsMahad -> sklMahad
+        // - mhsBahasa -> sklBahasa
+        // - mhsTipd -> sklTipd
+        $mahasiswa = Mahasiswa::with([
+            'mhsMahad.sklMahad', 
+            'mhsBahasa.sklBahasa', 
+            'mhsTipd.sklTipd'
+        ])->where('nim', $nim)->first();
 
-        // 3. Jika mahasiswa tidak ditemukan
+        // 3. Jika mahasiswa tidak ditemukan di data master
         if (!$mahasiswa) {
             return redirect()->route('public.cek')
-                             ->with('error', 'NIM tidak ditemukan. Pastikan NIM Anda benar.');
+                             ->with('error', 'NIM tidak ditemukan di data master mahasiswa. Pastikan NIM Anda benar.');
         }
 
-        // 4. Jika mahasiswa ditemukan, tapi tidak punya data SKL sama sekali
-        if (!$mahasiswa->sklMahad && !$mahasiswa->sklBahasa && !$mahasiswa->sklTipd) {
+        // 4. Ambil data SKL dari relasi bertingkat (bisa null)
+        // Gunakan optional() untuk keamanan jika peserta belum terdaftar
+        $sklMahad = optional($mahasiswa->mhsMahad)->sklMahad;
+        $sklBahasa = optional($mahasiswa->mhsBahasa)->sklBahasa;
+        $sklTipd = optional($mahasiswa->mhsTipd)->sklTipd;
+
+        // 5. Cek apakah ada setidaknya satu SKL
+        if (!$sklMahad && !$sklBahasa && !$sklTipd) {
              return redirect()->route('public.cek')
                              ->with('error', 'Mahasiswa ditemukan, namun belum ada data SKL yang diterbitkan.');
         }
 
-        // 5. Jika berhasil, kirim semua data ke view 'hasil_gabungan'
+        // 6. Kirim data ke view
         return view('frontend.hasil_gabungan', [
             'mahasiswa' => $mahasiswa,
-            'sklMahad' => $mahasiswa->sklMahad,
-            'sklBahasa' => $mahasiswa->sklBahasa,
-            'sklTipd' => $mahasiswa->sklTipd,
+            'sklMahad' => $sklMahad,
+            'sklBahasa' => $sklBahasa,
+            'sklTipd' => $sklTipd,
         ]);
     }
 
     // ===================================
-    // ==     FUNGSI BARU DIMULAI         ==
+    // ==     FUNGSI BARU DIMULAI       ==
     // ===================================
 
     /**
@@ -70,18 +81,22 @@ class PublicSertifikatController extends Controller
      */
     private function findSertifikat($no_sertifikat)
     {
-        // Muat relasi mahasiswa agar data nama, nim, dll selalu ada
-        $data = SklMahad::with('mahasiswa')->where('no_sertifikat', $no_sertifikat)->first();
+        // PENTING: Gunakan relasi bertingkat (mhs...->mahasiswa)
+
+        // 1. Cek di SKL Ma'had
+        $data = SklMahad::with('mhsMahad.mahasiswa')->where('no_sertifikat', $no_sertifikat)->first();
         if ($data) {
             return [$data, 'mahad'];
         }
 
-        $data = SklBahasa::with('mahasiswa')->where('no_sertifikat', $no_sertifikat)->first();
+        // 2. Cek di SKL Bahasa
+        $data = SklBahasa::with('mhsBahasa.mahasiswa')->where('no_sertifikat', $no_sertifikat)->first();
         if ($data) {
             return [$data, 'bahasa'];
         }
 
-        $data = SklTipd::with('mahasiswa')->where('no_sertifikat', $no_sertifikat)->first();
+        // 3. Cek di SKL TIPD
+        $data = SklTipd::with('mhsTipd.mahasiswa')->where('no_sertifikat', $no_sertifikat)->first();
         if ($data) {
             return [$data, 'tipd'];
         }
@@ -98,34 +113,33 @@ class PublicSertifikatController extends Controller
 
         // Jika tidak ditemukan
         if (!$data) {
-            // Jika Anda punya halaman error 404 kustom, gunakan itu
             return abort(404, 'Sertifikat tidak ditemukan.');
         }
         
-        // 1. Tentukan template PDF mana yang akan digunakan
+        // 1. Tentukan template PDF
         $viewTemplate = 'pdf.' . $type; // (pdf.mahad, pdf.bahasa, pdf.tipd)
 
-        // 2. Generate QR Code (Base64) untuk disematkan di PDF
+        // 2. Generate QR Code
         $validationUrl = route('public.validasi', $no_sertifikat);
         $qrCodeImage = QrCode::format('png')->size(200)->generate($validationUrl);
         $qrCodeBase64 = base64_encode($qrCodeImage);
         
-        // 3. Siapkan data untuk dikirim ke view PDF
+        // 3. Siapkan data untuk view
         $pdfData = [
-            'data' => $data, // $data berisi $sklMahad, $sklBahasa, atau $sklTipd
+            'data' => $data,
             'qrCodeBase64' => $qrCodeBase64,
         ];
 
-        // 4. Load PDF
-        // Pastikan App::environment() tidak 'local' jika background image bermasalah
-        // if (App::environment('local')) {
-        //     // Workaround untuk base64 di local
-        // }
-        
         $pdf = PDF::loadView($viewTemplate, $pdfData)->setPaper('a4', 'landscape');
         
+        // 4. Ambil NIM untuk nama file (Akses Bertingkat)
+        $nim = null;
+        if ($type == 'mahad') $nim = $data->mhsMahad->mahasiswa->nim;
+        elseif ($type == 'bahasa') $nim = $data->mhsBahasa->mahasiswa->nim;
+        elseif ($type == 'tipd') $nim = $data->mhsTipd->mahasiswa->nim;
+        
         // 5. Download file
-        return $pdf->download('sertifikat-' . $type . '-' . $data->mahasiswa->nim . '.pdf');
+        return $pdf->download('sertifikat-' . $type . '-' . $nim . '.pdf');
     }
 
     /**
@@ -135,11 +149,11 @@ class PublicSertifikatController extends Controller
     {
         [$data, $type] = $this->findSertifikat($no_sertifikat);
 
-        // Kirim data ke view validasi (yang akan kita buat)
-        // View ini akan menampilkan "Ditemukan" atau "Tidak Ditemukan"
+        // Kirim data ke view validasi
+        // View validasi juga perlu disesuaikan untuk akses data bertingkat
         return view('frontend.validasi', [
             'data' => $data,
-            'type' => $type, // 'mahad', 'bahasa', 'tipd', atau null
+            'type' => $type,
             'no_sertifikat' => $no_sertifikat,
         ]);
     }

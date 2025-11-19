@@ -3,6 +3,13 @@
 @section('title', 'Validasi Sertifikat')
 
 @section('content')
+@php
+    // Helper sederhana di dalam blade untuk mengambil objek mahasiswa
+    $mhs = null;
+    if ($type == 'mahad') $mhs = $data->mhsMahad;
+    elseif ($type == 'bahasa') $mhs = $data->mhsBahasa->mahasiswa;
+    elseif ($type == 'tipd') $mhs = $data->mhsTipd->mahasiswa;
+@endphp
 
 <header class="ex-header bg-gray">
     <div class="container px-4 sm:px-8 xl:px-4">
@@ -26,19 +33,19 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2 text-gray-700">
                         <div>
                             <span class="font-semibold">No. Sertifikat:</span>
-                            <span class="ml-2">{{ $data->no_sertifikat }}</span>
+                            <span class="ml-2">{{ $mhs->no_sertifikat }}</span>
                         </div>
                         <div>
                             <span class="font-semibold">Nama Lengkap:</span>
-                            <span class="ml-2">{{ $data->mahasiswa->nama }}</span>
+                            <span class="ml-2">{{ $mhs->nama }}</span>
                         </div>
                         <div>
                             <span class="font-semibold">NIM:</span>
-                            <span class="ml-2">{{ $data->mahasiswa->nim }}</span>
+                            <span class="ml-2">{{ $mhs->nim }}</span>
                         </div>
                         <div>
                             <span class="font-semibold">Program Studi:</span>
-                            <span class="ml-2">{{ $data->mahasiswa->program_studi }}</span>
+                            <span class="ml-2">{{ $mhs->program_studi }}</span>
                         </div>
                         <div>
                             <span class="font-semibold">Jenis SKL:</span>

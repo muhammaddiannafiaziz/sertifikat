@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\MhsMahad;
 use App\Models\Mahasiswa;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB; // Untuk transaksi database
 
 class PesertaMahadController extends Controller
@@ -58,25 +59,25 @@ class PesertaMahadController extends Controller
      */
     public function import(Request $request)
     {
-        // 1. Validasi file
-        $request->validate([
-            'file' => 'required|mimes:csv,txt|max:2048', // Batasi hanya CSV/TXT
+        // 1. Validasi file (tetap sama)
+        $validator = Validator::make($request->all(), [
+            'file' => 'required|mimes:csv,txt|max:2048',
         ]);
 
-        $file = $request->file('file');
-        $path = $file->getRealPath();
-        $data = array_map('str_getcsv', file($path));
-        
-        // Ambil header, asumsikan baris pertama adalah header dan berisi 'nim'
-        $header = array_shift($data);
-        $nimIndex = array_search('nim', array_map('strtolower', $header));
-
-        if ($nimIndex === false) {
-             return redirect()->route('peserta-mahad.index')->with('error', 'File import gagal. Pastikan header kolom pertama adalah "nim".');
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
         }
 
-        $successCount = 0;
-        $failCount = 0;
+        $file = $request->file('file');
+        $data = array_map('str_getcsv', file($file));
+        $nimIndex = 0; 
+        
+        $successCount = 0; // Jumlah NIM yang berhasil diproses
+        $failCount = 0;    // Jumlah NIM yang gagal (tidak ada di Mahasiswa master)
+        
+        $failedNims = []; // NIM yang tidak ada di Mahasiswa master
+        // DEKLARASI: Array baru untuk menyimpan NIM yang sudah ada (terduplikasi)
+        $existingNims = []; 
         
         // Mulai transaksi database
         DB::beginTransaction();
@@ -84,7 +85,7 @@ class PesertaMahadController extends Controller
         try {
             foreach ($data as $row) {
                 if (!isset($row[$nimIndex]) || empty($row[$nimIndex])) {
-                    continue; // Skip jika kolom NIM kosong
+                    continue;
                 }
 
                 $nim = trim($row[$nimIndex]);
@@ -93,19 +94,44 @@ class PesertaMahadController extends Controller
                 $mahasiswaMaster = Mahasiswa::where('nim', $nim)->exists();
                 
                 if ($mahasiswaMaster) {
-                    // Gunakan firstOrCreate untuk menghindari duplikasi jika nim sudah ada di mhsmahad
-                    MhsMahad::firstOrCreate(['nim' => $nim]);
-                    $successCount++;
+                    // Gunakan firstOrCreate
+                    $mhsMahad = MhsMahad::firstOrCreate(['nim' => $nim]);
+                    
+                    // CEK DUPLIKASI/SUDAH ADA
+                    if ($mhsMahad->wasRecentlyCreated) {
+                        // Data baru berhasil dibuat
+                        $successCount++;
+                    } else {
+                        // Data sudah ada di MhsMahad, ini yang dianggap "terduplikasi"
+                        $existingNims[] = $nim;
+                        // Kita tetap hitung sebagai successCount karena berhasil diproses (diperbarui/ditemukan)
+                        $successCount++; 
+                    }
+                    
                 } else {
+                    // NIM tidak ditemukan di Mahasiswa Master
+                    $failedNims[] = $nim;
                     $failCount++;
                 }
             }
 
             DB::commit();
             
-            $message = "Import berhasil! {$successCount} Peserta Ma'had ditambahkan/diperbarui.";
+            // 3. GENERASI PESAN AKHIR
+            $message = "Import berhasil! {$successCount} Peserta Ma'had diproses (ditambahkan/ditemukan).";
+            
+            // Pesan untuk NIM yang sudah ada
+            if (!empty($existingNims)) {
+                $existingNimsList = implode(', ', $existingNims);
+                // Jumlah data yang benar-benar baru
+                $newCount = $successCount - count($existingNims);
+                $message .= " **({$newCount} data baru, dan " . count($existingNims) . " NIM sudah ada: {$existingNimsList}.)**";
+            }
+            
+            // Pesan untuk NIM yang gagal (tidak ditemukan di data master)
             if ($failCount > 0) {
-                 $message .= " ({$failCount} NIM gagal karena tidak ditemukan di data master Mahasiswa.)";
+                $failedNimsList = implode(', ', $failedNims);
+                $message .= " **({$failCount} NIM gagal karena tidak ditemukan di data master Mahasiswa: {$failedNimsList}.)**";
             }
 
             return redirect()->route('peserta-mahad.index')->with('success', $message);

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\MhsBahasa; // Model Peserta Bahasa
 use App\Models\Mahasiswa;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 
 class PesertaBahasaController extends Controller
@@ -44,23 +45,23 @@ class PesertaBahasaController extends Controller
 
     public function import(Request $request)
     {
-        $request->validate([
+        // 1. Validasi file
+        $validator = Validator::make($request->all(), [
             'file' => 'required|mimes:csv,txt|max:2048',
         ]);
 
-        $file = $request->file('file');
-        $path = $file->getRealPath();
-        $data = array_map('str_getcsv', file($path));
-        
-        $header = array_shift($data);
-        $nimIndex = array_search('nim', array_map('strtolower', $header));
-
-        if ($nimIndex === false) {
-             return redirect()->route('peserta-bahasa.index')->with('error', 'File import gagal. Pastikan header kolom pertama adalah "nim".');
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
         }
 
-        $successCount = 0;
+        $file = $request->file('file');
+        $data = array_map('str_getcsv', file($file));
+        $nimIndex = 0; 
+        
+        $successCount = 0; 
         $failCount = 0;
+        $failedNims = []; 
+        $existingNims = []; 
         
         DB::beginTransaction();
 
@@ -72,28 +73,49 @@ class PesertaBahasaController extends Controller
 
                 $nim = trim($row[$nimIndex]);
 
+                // Cek apakah NIM ada di tabel Mahasiswa master
                 $mahasiswaMaster = Mahasiswa::where('nim', $nim)->exists();
                 
                 if ($mahasiswaMaster) {
-                    MhsBahasa::firstOrCreate(['nim' => $nim]);
-                    $successCount++;
+                    // Menggunakan Model
+                    $mhsBahasa = MhsBahasa::firstOrCreate(['nim' => $nim]);
+                    
+                    if ($mhsBahasa->wasRecentlyCreated) {
+                        $successCount++;
+                    } else {
+                        $existingNims[] = $nim;
+                        $successCount++;
+                    }
+                    
                 } else {
+                    $failedNims[] = $nim;
                     $failCount++;
                 }
             }
 
             DB::commit();
             
-            $message = "Import berhasil! {$successCount} Peserta Bahasa ditambahkan/diperbarui.";
+            // 3. GENERASI PESAN AKHIR
+            $message = "Import SKL Bahasa berhasil! {$successCount} Peserta diproses (ditambahkan/ditemukan).";
+            
+            if (!empty($existingNims)) {
+                $existingNimsList = implode(', ', $existingNims);
+                $newCount = $successCount - count($existingNims);
+                $message .= " **({$newCount} data baru, dan " . count($existingNims) . " NIM sudah ada: {$existingNimsList}.)**";
+            }
+            
             if ($failCount > 0) {
-                 $message .= " ({$failCount} NIM gagal karena tidak ditemukan di data master Mahasiswa.)";
+                $failedNimsList = implode(', ', $failedNims);
+                $message .= " **({$failCount} NIM gagal karena tidak ditemukan di data master Mahasiswa: {$failedNimsList}.)**";
             }
 
+            // Pastikan route ini benar untuk SKL Bahasa
             return redirect()->route('peserta-bahasa.index')->with('success', $message);
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->route('peserta-bahasa.index')->with('error', 'Terjadi kesalahan saat import: ' . $e->getMessage());
+            // Pastikan route ini benar untuk SKL Bahasa
+            return redirect()->route('peserta-bahasa.index')->with('error', 'Terjadi kesalahan saat import SKL Bahasa: ' . $e->getMessage());
         }
     }
 

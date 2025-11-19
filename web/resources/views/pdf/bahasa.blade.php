@@ -9,7 +9,7 @@
         .page { width: 297mm; height: 210mm; position: relative; page-break-after: always; }
         .page:last-child { page-break-after: avoid; }
 
-        /* Backgrounds (sesuai CSS baru Anda) */
+        /* Backgrounds */
         .bg-arab {
             background: url('data:image/jpeg;base64,{{ base64_encode(file_get_contents(public_path("storage/backgrounds/bgsklarab.png"))) }}') no-repeat center center;
             background-size: cover;
@@ -32,8 +32,8 @@
                 <div class="details">
                     <p><strong>{{ $data->no_sertifikat }}</strong></p>
                     <br>
-                    <p><strong>Nama:</strong> {{ $data->mahasiswa->nama }}</p>
-                    <p><strong>NIM:</strong> {{ $data->mahasiswa->nim }}</p>
+                    <p><strong>Nama:</strong> {{ $data->mhsBahasa->mahasiswa->nama }}</p>
+                    <p><strong>NIM:</strong> {{ $data->mhsBahasa->mahasiswa->nim }}</p>
                     <br>
                     <p><strong>SKL BAHASA ARAB</strong></p>
                     <p>Nilai Istima': <strong>{{ $data->istima ?? '-' }}</strong></p>
@@ -53,9 +53,8 @@
                 <div class="details">
                     <p><strong>{{ $data->no_sertifikat }}</strong></p>
                     <br>
-                    <p><strong>Nama:</strong> {{ $data->mahasiswa->nama }}</p>
-                    <p><strong>Program Studi:</strong> {{ $data->mahasiswa->program_studi }}</p>
-                    <p><strong>NIM:</strong> {{ $data->mahasiswa->nim }}</p>
+                    <p><strong>Nama:</strong> {{ $data->mhsBahasa->mahasiswa->nama }}</p>
+                    <p><strong>NIM:</strong> {{ $data->mhsBahasa->mahasiswa->nim }}</p>
                     <br>
                     <p><strong>SKL BAHASA INGGRIS</strong></p>
                     <p>Nilai Listening: <strong>{{ $data->listening ?? '-' }}</strong></p>
