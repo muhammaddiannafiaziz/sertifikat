@@ -153,5 +153,40 @@ class SklMahadController extends Controller
         return redirect()->route('skl-mahad.index')->with('success', 'Data SKL Ma\'had berhasil dihapus.');
     }
 
-    // Kita akan tambahkan fungsi 'export' dan 'download' nanti
+    public function export()
+    {
+        $fileName = 'skl_mahad_' . date('Y-m-d_H-i') . '.csv';
+        
+        // Ambil semua data SKL dengan relasi mahasiswa
+        $data = SklMahad::with('mhsMahad.mahasiswa')->get();
+
+        $headers = [
+            "Content-type"        => "text/csv",
+            "Content-Disposition" => "attachment; filename=$fileName",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0"
+        ];
+
+        $callback = function() use ($data) {
+            $file = fopen('php://output', 'w');
+            
+            // Header Kolom Excel
+            fputcsv($file, ['Nama Mahasiswa', 'NIM', 'Program Studi', 'No Sertifikat', 'Status Ibadah', 'Status Al-Quran']);
+
+            foreach ($data as $row) {
+                fputcsv($file, [
+                    $row->mhsMahad->mahasiswa->nama,
+                    $row->mhsMahad->mahasiswa->nim,
+                    $row->mhsMahad->mahasiswa->program_studi,
+                    $row->no_sertifikat,
+                    $row->status_ujian_ibadah, // luls/tidak_lulus
+                    $row->status_ujian_alquran
+                ]);
+            }
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
 }

@@ -153,4 +153,48 @@ class SklBahasaController extends Controller
         // 3. Redirect kembali
         return redirect()->route('skl-bahasa.index')->with('success', 'Data SKL Bahasa berhasil dihapus.');
     }
+
+    public function export()
+    {
+        $fileName = 'skl_bahasa_' . date('Y-m-d_H-i') . '.csv';
+        
+        $data = SklBahasa::with('mhsBahasa.mahasiswa')->get();
+
+        $headers = [
+            "Content-type"        => "text/csv",
+            "Content-Disposition" => "attachment; filename=$fileName",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0"
+        ];
+
+        $callback = function() use ($data) {
+            $file = fopen('php://output', 'w');
+            
+            // Header Kolom Excel (9 Kolom)
+            fputcsv($file, [
+                'Nama Mahasiswa', 'NIM', 'Program Studi', 'No Sertifikat',
+                'Istima\'', 'Kitabah', 'Qira\'ah', // Arab
+                'Listening', 'Writing', 'Reading'   // Inggris
+            ]);
+
+            foreach ($data as $row) {
+                fputcsv($file, [
+                    $row->mhsBahasa->mahasiswa->nama,
+                    $row->mhsBahasa->mahasiswa->nim,
+                    $row->mhsBahasa->mahasiswa->program_studi,
+                    $row->no_sertifikat,
+                    $row->istima,
+                    $row->kitabah,
+                    $row->qiraah,
+                    $row->listening,
+                    $row->writing,
+                    $row->reading
+                ]);
+            }
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
 }

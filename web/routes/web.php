@@ -134,6 +134,15 @@ Route::middleware('auth')->group(function () {
     // ==     RUTE SKL BARU (DENGAN ROLE) ==
     // ===================================
 
+     Route::get('skl-mahad/export', [SklMahadController::class, 'export'])->name('skl-mahad.export')
+         ->middleware('can:manage-mahad');
+
+     Route::get('skl-bahasa/export', [SklBahasaController::class, 'export'])->name('skl-bahasa.export')
+         ->middleware('can:manage-bahasa');
+     
+     Route::get('skl-tipd/export', [SklTipdController::class, 'export'])->name('skl-tipd.export')
+         ->middleware('can:manage-tipd');
+
     // Rute SKL Ma'had (Hanya bisa diakses oleh 'adminmahad' & 'superadmin')
     Route::resource('skl-mahad', SklMahadController::class)
          ->middleware('can:manage-mahad');

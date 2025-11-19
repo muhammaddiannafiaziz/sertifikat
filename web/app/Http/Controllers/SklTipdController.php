@@ -145,4 +145,44 @@ class SklTipdController extends Controller
         // 3. Redirect kembali
         return redirect()->route('skl-tipd.index')->with('success', 'Data SKL Komputer berhasil dihapus.');
     }
+
+    public function export()
+    {
+        $fileName = 'skl_komputer_' . date('Y-m-d_H-i') . '.csv';
+        
+        $data = SklTipd::with('mhsTipd.mahasiswa')->get();
+
+        $headers = [
+            "Content-type"        => "text/csv",
+            "Content-Disposition" => "attachment; filename=$fileName",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0"
+        ];
+
+        $callback = function() use ($data) {
+            $file = fopen('php://output', 'w');
+            
+            // Header Kolom Excel
+            fputcsv($file, [
+                'Nama Mahasiswa', 'NIM', 'Program Studi', 'No Sertifikat',
+                'Word', 'Excel', 'Power Point'
+            ]);
+
+            foreach ($data as $row) {
+                fputcsv($file, [
+                    $row->mhsTipd->mahasiswa->nama,
+                    $row->mhsTipd->mahasiswa->nim,
+                    $row->mhsTipd->mahasiswa->program_studi,
+                    $row->no_sertifikat,
+                    $row->word,
+                    $row->excel,
+                    $row->power_point
+                ]);
+            }
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
 }

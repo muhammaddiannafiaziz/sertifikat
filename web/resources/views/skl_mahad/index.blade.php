@@ -33,6 +33,9 @@
         </form>
 
         <div class="d-flex gap-2">
+            <a href="{{ route('skl-mahad.export') }}" class="btn btn-success btn-sm" style="font-size: 12px;">
+                <i class="bi bi-file-earmark-spreadsheet"></i> Export Excel
+            </a>
             <a href="{{ route('skl-mahad.create') }}" class="btn btn-primary btn-sm" style="font-size: 12px;">
                 <i class="bi bi-plus-lg"></i> Tambah Data SKL
             </a>
